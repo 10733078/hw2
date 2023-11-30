@@ -1,0 +1,33 @@
+class Cashier:
+    def __init__(self, id, checkout_time):
+        self.id = id
+        self.checkout_time = checkout_time
+        self.current_customer = None
+
+    def start_checkout(self, customer):
+        self.current_customer = customer
+        print(f"Cashier {self.id} is checking out Customer {customer}")
+
+    def process_checkout(self):
+        if self.current_customer is not None:
+            self.checkout_time -= 1
+            if self.checkout_time == 0:
+                print(f"Cashier {self.id} has finished checking out for Customer {self.current_customer}")
+                self.current_customer = None
+
+def simulate_checkout(n, checkout_times, m):
+    cashiers = [Cashier(i + 1, checkout_times[i]) for i in range(n)]
+    queue = list(range(1, m + 1))
+
+    time = 0
+    while queue or any(c.checkout_time > 0 for c in cashiers):
+        for cashier in cashiers:
+            if cashier.checkout_time > 0 and cashier.current_customer is None and queue:
+                customer = queue.pop(0)
+                cashier.start_checkout(customer)
+
+        for cashier in cashiers:
+            if cashier.checkout_time == 0 and cashier.current_customer is not None:
+                cashier.process_checkout()
+
+        time += 1
