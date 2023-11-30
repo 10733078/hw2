@@ -1,0 +1,61 @@
+def is_valid_move(row, col, maze_layout, rows, cols):
+    return 0 <= row < rows and 0 <= col < cols and maze_layout[row][col] != "1"
+
+def play_maze_game(rows, cols, maze_layout, movement_path):
+    stack = []
+    player_position = None
+    obstacle_position = None
+    endpoint_position = None
+
+    for i in range(rows):
+        for j in range(cols):
+            if maze_layout[i][j] == "P":
+                player_position = (i, j)
+            elif maze_layout[i][j] == "E":
+                endpoint_position = (i, j)
+            elif maze_layout[i][j] == "X":
+                obstacle_position = (i, j)
+
+    for move in movement_path:
+        if move.lower() in ('w', 's', 'a', 'd'):  # Valid moves
+            row, col = player_position
+
+            if move.lower() == 'w':
+                row -= 1
+            elif move.lower() == 's':
+                row += 1
+            elif move.lower() == 'a':
+                col -= 1
+            elif move.lower() == 'd':
+                col += 1
+
+            if is_valid_move(row, col, maze_layout, rows, cols):
+                stack.append(player_position)
+                player_position = (row, col)
+        elif move.lower() == 'b' and stack:  # Undo the previous step
+            player_position = stack.pop()
+
+        if player_position == obstacle_position:
+            print("Game Over - You collided with the obstacle!")
+            return
+        elif player_position == endpoint_position:
+            print("Congratulations! You reached the endpoint!")
+            return
+
+    print("You didn't reach the endpoint.")
+
+
+# Input data
+maze_data = [
+    ["P", "0", "0", "1", "0"],
+    ["1", "1", "0", "1", "0"],
+    ["X", "0", "0", "0", "0"],
+    ["0", "1", "1", "1", "0"],
+    ["0", "0", "0", "0", "E"]
+]
+movement_input = "ddssbbssddss"
+
+rows, cols = 5, 5
+
+# Play the game
+play_maze_game(rows, cols, maze_data, movement_input)
